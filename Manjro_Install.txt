@@ -254,6 +254,7 @@ locale-gen
 time_zone=$(curl -s https://ipinfo.io/timezone)
 ln -sf /usr/share/zoneinfo/$time_zone /etc/localtime
 hwclock --systohc
+clear
 pacman-mirrors --fasttrack
 pacman -Syy
 clear
@@ -351,11 +352,11 @@ clear
 pacman -Syy
 clear
 # Services
-pacman -S nm-connection-editor modemmanager usb_modeswitch rp-pppoe --needed --noconfirm
+pacman -S nm-connection-editor modemmanager usb_modeswitch rp-pppoe manjaro-modem --needed --noconfirm
 clear
-pacman -S bluez bluez-utils --needed --noconfirm
+pacman -S bluez bluez-utils manjaro-bluetooth --needed --noconfirm
 clear
-pacman -S cups cups-pdf ghostscript gsfonts --needed --noconfirm
+pacman -S cups cups-pdf ghostscript gsfonts manjaro-printer --needed --noconfirm
 clear
 pacman -S cronie haveged openssh --needed --noconfirm
 clear
@@ -384,16 +385,16 @@ clear
 pacman -S dosfstools ntfs-3g btrfs-progs exfat-utils gptfdisk fuse2 fuse3 fuseiso --needed --noconfirm
 clear
 # SAMBA
-pacman -S samba gvfs gvfs-smb smbclient cifs-utils gvfs-afc gvfs-mtp gvfs-nfs gvfs-dnssd gvfs-goa gvfs-google gvfs-gphoto2 gvfs-onedrive gvfs-wsdd --needed --noconfirm
+pacman -S samba gvfs gvfs-smb smbclient cifs-utils gvfs-afc gvfs-mtp gvfs-nfs gvfs-dnssd gvfs-goa gvfs-google gvfs-gphoto2 gvfs-onedrive gvfs-wsdd manjaro-settings-samba --needed --noconfirm
 # ЗВУК
 # Wireplumber Pipewire
-pacman -S wireplumber pipewire-alsa pipewire-jack pipewire-pulse pipewire-v4l2 pipewire-zeroconf gst-plugin-pipewire helvum --needed --noconfirm
+pacman -S wireplumber pipewire-alsa pipewire-jack pipewire-pulse pipewire-v4l2 pipewire-zeroconf gst-plugin-pipewire helvum manjaro-pipewire --needed --noconfirm
 clear
 # Alsa
-pacman -S alsa-firmware alsa-plugins alsa-utils sof-firmware --needed --noconfirm
+pacman -S alsa-firmware alsa-plugins alsa-utils sof-firmware manjaro-alsa --needed --noconfirm
 clear
 # GStreamer
-pacman -S gst-libav gst-plugins-bad gst-plugins-base gst-plugins-ugly gst-plugin-pipewire gst-plugin-va --needed --noconfirm
+pacman -S gst-libav gst-plugins-bad gst-plugins-base gst-plugins-ugly gst-plugin-pipewire gst-plugin-va manjaro-gstreamer --needed --noconfirm
 clear
 # Firewalld
 pacman -S firewalld python-capng python-pyqt5 --needed --noconfirm
@@ -502,6 +503,20 @@ pacman -S arcolinux-meta-btrfs-timeshift --needed --noconfirm
 clear
 
 
+###############################
+## СИСТЕМНЫЕ УТИЛИТЫ MANJARO ##
+###############################
+
+
+clear
+pacman -Syy
+clear
+pacman -S manjaro-hello manjaro-settings-manager manjaro-system manjaro-application-utility manjaro-backgrounds manjaro-check-repos manjaro-browser-settings manjaro-downgrade manjaro-downloader-images manjaro-input manjaro-iso-downloader manjaro-connman manjaro-ranger-settings manjaro-base-skel manjaro-release manjaro-handheld manjaro-log-helper --needed --noconfirm
+clear
+pacman -S manjaro-wallpapers-17.0 manjaro-wallpapers-18.0 manjaro-wallpapers-by-lunix-cool-logo manjaro-wallpapers-by-lunix-manjaro manjaro-icons manjaro-asian-input-support-fcitx manjaro-pacnew-checker --needed --noconfirm
+clear
+
+
 
 
 ###########################################
@@ -509,8 +524,6 @@ clear
 ###########################################
 
 
-
-pacman -S arcolinux-meta-apps --needed --noconfirm
 clear
 pacman -S mkinitcpio-firmware --needed --noconfirm
 clear
@@ -563,7 +576,7 @@ clear
 
 
 
-pacman -S sddm plasma-meta kde-applications-meta flatpak --needed --noconfirm
+pacman -S sddm plasma-meta kde-applications-meta flatpak manjaro-kde-settings manjaro-settings-manager-knotifier --needed --noconfirm
 systemctl enable sddm
 clear
 sed -i s/'#AutoEnable=true'/'AutoEnable=true'/g /etc/bluetooth/main.conf
@@ -620,6 +633,9 @@ pacman -S xfce4 xfce4-goodies --needed --noconfirm
 clear
 pacman -S mugshot pavucontrol archlinux-xdg-menu ttf-droid ttf-dejavu alacarte network-manager-applet --needed --noconfirm
 update-menus
+clear
+pacman -S manjaro-xfce-settings  manjaro-wallpapers-by-lunix-xfce manjaro-xfce-settings-shells manjaro-settings-manager-notifier --needed --noconfirm
+clear
 pacman -Sy lightdm lightdm-slick-greeter lightdm-settings --needed --noconfirm
 clear
 pacman -Sy blueman xarchiver ffmpegthumbnailer libgsf udiskie --needed --noconfirm
@@ -697,6 +713,8 @@ sudo reboot
 pacman -S gnome gnome-extra --needed --noconfirm
 systemctl enable gdm
 clear
+pacman -S manjaro-gnome-backgrounds manjaro-gnome-extension-settings manjaro-gnome-extension-settings-shells manjaro-gnome-settings manjaro-gnome-settings-shells manjaro-gnome-vanilla manjaro-wallpapers-by-lunix-gnome manjaro-settings-manager-notifier --needed --noconfirm
+clear
 pacman -S gnome-terminal-transparency gnome-shell-extensions chrome-gnome-shell --needed --noconfirm
 clear
 sed -i s/'#AutoEnable=true'/'AutoEnable=true'/g /etc/bluetooth/main.conf
@@ -754,7 +772,7 @@ clear
 
 
 
-pacman -S lightdm lightdm-webkit2-greeter lightdm-webkit-theme-aether cinnamon cinnamon-translations metacity  gnome-terminal blueberry gnome-screenshot gnome-keyring system-config-printer iso-flag-png --needed --noconfirm
+pacman -S lightdm lightdm-webkit2-greeter lightdm-webkit-theme-aether cinnamon cinnamon-translations metacity  gnome-terminal blueberry gnome-screenshot gnome-keyring system-config-printer iso-flag-png manjaro-cinnamon-settings manjaro-wallpapers-by-lunix-cinnamon manjaro-settings-manager-notifier --needed --noconfirm
 sed -i s/'#greeter-session=example-gtk-gnome'/'greeter-session=lightdm-webkit2-greeter'/g /etc/lightdm/lightdm.conf
 sed -i s/'#display-setup-script='/'display-setup-script=xrandr --output Virtual-1 --mode 1920x1080'/g /etc/lightdm/lightdm.conf
 #sed -i s/'webkit_theme        = antergos'/'webkit_theme        = litarvan'/g /etc/lightdm/lightdm-webkit2-greeter.conf
@@ -810,7 +828,7 @@ clear
 
 
 pacman -S mate mate-extra --needed --noconfirm
-pacman -S mate-themes mate-tweak brisk-menu gnome-system-tools --needed --noconfirm
+pacman -S mate-themes mate-tweak brisk-menu gnome-system-tools manjaro-settings-manager-notifier --needed --noconfirm
 pacman -S plank plank-themes --needed --noconfirm
 pacman -Sy lightdm lightdm-slick-greeter lightdm-settings --needed --noconfirm
 sed -i s/'#greeter-session=example-gtk-gnome'/'greeter-session=lightdm-slick-greeter'/g /etc/lightdm/lightdm.conf
@@ -867,7 +885,7 @@ clear
 
 
 
-pacman -S lxqt lxqt-themes xscreensaver picom libstatgrab libsysstat breeze-icons kvantum-qt5 mugshot nm-tray --needed --noconfirm
+pacman -S lxqt lxqt-themes xscreensaver picom libstatgrab libsysstat breeze-icons kvantum-qt5 mugshot nm-tray manjaro-settings-manager-notifier --needed --noconfirm
 pacman -Sy lightdm lightdm-slick-greeter lightdm-settings --needed --noconfirm
 clear
 sed -i s/'#greeter-session=example-gtk-gnome'/'greeter-session=lightdm-slick-greeter'/g /etc/lightdm/lightdm.conf
@@ -946,7 +964,7 @@ pacman -Syy
 clear
 pacman -S lxde leafpad openbox ttf-dejavu ttf-liberation obconf pavucontrol alsa-utils xfce4-notifyd --needed --noconfirm
 clear
-pacman -S xscreensaver picom libstatgrab libsysstat arc-gtk-theme mugshot nm-tray dunst --needed --noconfirm
+pacman -S xscreensaver picom libstatgrab libsysstat arc-gtk-theme mugshot nm-tray dunst --needed manjaro-settings-manager-notifier --noconfirm
 clear
 pacman -Sy lxqt-archiver ffmpegthumbnailer exaile --needed --noconfirm
 clear
@@ -1010,7 +1028,7 @@ clear
 
 pacman -Syy
 pacman -S budgie-desktop --needed --noconfirm
-pacman -S gnome gnome-control-center --needed --noconfirm
+pacman -S gnome gnome-control-center manjaro-wallpapers-by-lunix-budgie manjaro-settings-manager-notifier --needed --noconfirm
 pacman -S materia-gtk-theme papirus-icon-theme i3lock --needed --noconfirm
 pacman -S lightdm lightdm-gtk-greeter --needed --noconfirm
 sed -i s/'#display-setup-script='/'display-setup-script=xrandr --output Virtual-1 --mode 1920x1080'/g /etc/lightdm/lightdm.conf
