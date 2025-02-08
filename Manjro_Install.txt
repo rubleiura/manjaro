@@ -1,28 +1,35 @@
-########### Макет установки MANJARO (BTRFS SNAPPER) ###########################
+
+########################################################
+#### Макет установки MANJARO (BTRFS SNAPPER) ########
+########################################################
 
 
 
-########################### Тестирование ##########################################
+##################
+## Тестирование ##
+##################
+
 
 
 
 clear
 setfont cyr-sun16
 sed -i "s/#\(en_US\.UTF-8\)/\1/" /etc/locale.gen
+sed -i "s/#\(en_US\ ISO-8859-1\)/\1/" /etc/locale.gen
 sed -i "s/#\(ru_RU\.UTF-8\)/\1/" /etc/locale.gen
+sed -i "s/#\(ru_RU\ ISO-8859-5\)/\1/" /etc/locale.gen
 locale-gen
 export LANG=ru_RU.UTF-8
-sed -i s/'ParallelDownloads = 4'/'ParallelDownloads = 10'/g /etc/pacman.conf
+sed -i s/'#ParallelDownloads = 5'/'ParallelDownloads = 15'/g /etc/pacman.conf
 sed -i s/'#Color'/'Color'/g /etc/pacman.conf
 echo "[options]" >> /etc/pacman.conf
 echo "ILoveCandy" >> /etc/pacman.conf
 time_zone=$(curl -s https://ipinfo.io/timezone)
 timedatectl set-timezone $time_zone
-pacman-mirrors --fasttrack
 pacman -Syy
-pacman -Sy archlinux-keyring manjaro-keyring  neofetch inxi --noconfirm
+pacman -Sy archlinux-keyring manjaro-keyring fastfetch inxi --noconfirm
 clear
-sudo neofetch
+fastfetch
 date
 sudo inxi -M
 sudo inxi -I
@@ -31,58 +38,85 @@ lsblk
 
 
 
+################
+## Переменные ##
+################
 
-############################ Переменные ###########################################
+
+
+#########################################################################
+## Этот пункт предназначен для изменения переменных.                   ##
+## Он обязателен.Иначе установка системы  может пойти с ошибками.      ## 
+## Если параметры из раздела Тестирования не совпадают с параметрами   ##
+## раздела Переменные, необходимо с помощью текстового редактора       ##
+## провести групповое переименование переменных в таблице ниже,        ##
+## чтобы они соответствовали результатам тестирования.                 ##
+## По желанию можно изменить параметры пользователя, компьютера и ядра.##
+#########################################################################
 
 
 
-Этот пункт если Вы собираетесь изменять переменные
+#############################################
+#  Объект           #   Переменная          #
+#############################################
+#  Диски            #   sda sda1 sda2 sda3  #
+#############################################
+#  Имя пользователя #   login	            #
+#############################################
+#  Имя менедж.входа #  	User Name           #
+#############################################
+#   Hostname 	    #   Sony                #
+#############################################
+#   Microcode	    #   intel-ucode         #
+#############################################
+#   Ядро	        #   linux66             #
+#############################################
+#   размер SWAP	    #	sgdisk -n 2::-4G    #
+#############################################
 
-Переменные можно изменить с помощью текстового редактора.
 
-Диски  			sda sda1 sda2 sda3
--------------------------------------------------------
-Имя пользователя 	  administrator   
 
-Имя менедж.входа    Administrator
------------------------------------------------------------
-Hostname 		     PackardBell
----------------------------------------------------------
-микрокод		     intel-ucode
-----------------------------------------------------------
-Ядро                 linux66
-------------------------------------------------------------------
-размер SWAP		     sgdisk -n 2::-4G
----------------------------------------------------------
-Если система ставится на HDD, необходимо изменить параметры btrfs
-c
-SSD
+Если система ставится на HDD, необходимо
+
+изменить параметры btrfs c SSD :
+
 ssd,noatime,space_cache=v2,compress=zstd:2,discard=async
-на
-HDD
+
+на HDD :
+
 noatime,space_cache=v2,compress=zstd:2,autodefrag
 
 
 
-### ФОРМАТИРОВАНИЕ,РАЗМЕТКА,МОНТИРОВАНИЕ,УСТ.БАЗОВЫХ ПАКЕТОВ,CHROOT #############
 
 
+########################################################
+################### УСТАНОВКА В UEFI  ##################
+########################################################
 
-####################### <<< UEFI >>> ###########################
 
-# РАЗМЕТКА
+##############
+## РАЗМЕТКА ##
+##############
+
+
 
 clear
 sgdisk -Z /dev/sda
 sgdisk -a 2048 -o /dev/sda
 sgdisk -n 1::+512M --typecode=1:ef00 --change-name=1:'EFI' /dev/sda
-sgdisk -n 2::-4G --typecode=2:8300 --change-name=2:'ArchLinux' /dev/sda
+sgdisk -n 2::-4G --typecode=2:8300 --change-name=2:'Manjaro' /dev/sda
 sgdisk -n 3::-0 --typecode=3:8200 --change-name=3:'SWAP' /dev/sda
 clear
-lsblk
+fdisk -l /dev/sda
 
 
-# ФОРМАТИРОВАНИЕ, МОНТИРОВАНИЕ, УСТ.БАЗОВЫХ ПАКЕТОВ ВХОД в СИСТЕМУ CHROOT #
+#############################################
+## ФОРМАТИРОВАНИЕ, МОНТИРОВАНИЕ, УСТАНОВКА ##
+## БАЗОВЫХ ПАКЕТОВ, ВХОД в СИСТЕМУ CHROOT  ##
+#############################################
+
+
 
 
 clear
@@ -111,7 +145,7 @@ mount -o ssd,noatime,space_cache=v2,compress=zstd:2,discard=async,subvol=@log /d
 mount -o ssd,noatime,space_cache=v2,compress=zstd:2,discard=async,subvol=@tmp /dev/sda2 /mnt/var/tmp
 mount /dev/sda1 /mnt/boot/efi
 clear
-basestrap /mnt base base-devel manjaro-tools-base linux66 linux66-headers linux-firmware btrfs-progs bash-completion archlinux-keyring manjaro-keyring nano nano-syntax-highlighting intel-ucode efibootmgr inxi neofetch
+basestrap /mnt base base-devel manjaro-tools-base btrfs-progs bash-completion archlinux-keyring manjaro-keyring nano nano-syntax-highlighting intel-ucode efibootmgr inxi
 clear
 fstabgen -U -p /mnt >> /mnt/etc/fstab
 clear
@@ -120,17 +154,22 @@ manjaro-chroot /mnt
 
 
 
-#################### <<< BIOS >>> ################################
+
+########################################################
+############# УСТАНОВКА В BIOS  ########################
+########################################################
 
 
-# РАЗМЕТКА
+##############
+## РАЗМЕТКА ##
+##############
 
 
 clear
 sgdisk -Z /dev/sda
 sgdisk -a 2048 -o /dev/sda
 sgdisk -n 1::+8M --typecode=1:ef02 --change-name=1:'BIOSBOOT' /dev/sda
-sgdisk -n 2::-4G --typecode=2:8300 --change-name=2:'ArchLinux' /dev/sda
+sgdisk -n 2::-4G --typecode=2:8300 --change-name=2:'Manjaro' /dev/sda
 sgdisk -n 3::-0 --typecode=3:8200 --change-name=3:'SWAP' /dev/sda
 clear
 lsblk
@@ -163,7 +202,7 @@ mount -o ssd,noatime,space_cache=v2,compress=zstd:2,discard=async,subvol=@cache 
 mount -o ssd,noatime,space_cache=v2,compress=zstd:2,discard=async,subvol=@log /dev/sda2 /mnt/var/log
 mount -o ssd,noatime,space_cache=v2,compress=zstd:2,discard=async,subvol=@tmp /dev/sda2 /mnt/var/tmp
 clear
-basestrap /mnt base base-devel manjaro-tools-base linux66 linux66-headers linux-firmware btrfs-progs bash-completion archlinux-keyring manjaro-keyring nano nano-syntax-highlighting intel-ucode inxi neofetch
+basestrap /mnt base base-devel manjaro-tools-base btrfs-progs bash-completion archlinux-keyring manjaro-keyring nano nano-syntax-highlighting intel-ucode inxi
 clear
 fstabgen -U -p /mnt >> /mnt/etc/fstab
 clear
@@ -172,9 +211,14 @@ manjaro-chroot /mnt
 
 
 
-################################### CHROOT ######################################
+########################################################
+################## CHROOT ##############################
+########################################################
 
-############# НАСТРОЙКИ PACMAN,FSTAB,ЯЗЫК,ЧАСОВОЙ ПОЯС #####################
+
+##############################################
+## НАСТРОЙКИ PACMAN,FSTAB,ЯЗЫК,ЧАСОВОЙ ПОЯС ##
+##############################################
 
 
 
@@ -182,16 +226,29 @@ manjaro-chroot /mnt
 
 sed -i 's/\S*subvol=\(\S*\)/subvol=\1,ssd,noatime,space_cache=v2,compress=zstd:2,discard=async/g'  /etc/fstab
 sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
-sed -i s/'ParallelDownloads = 4'/'ParallelDownloads = 10'/g /etc/pacman.conf
+sed -i s/'#ParallelDownloads = 5'/'ParallelDownloads = 15'/g /etc/pacman.conf
 sed -i s/'#Color'/'Color'/g /etc/pacman.conf
 echo "[options]" >> /etc/pacman.conf
 echo "ILoveCandy" >> /etc/pacman.conf
-echo "KEYMAP=ru" >> /etc/vconsole.conf
+echo "KEYMAP=ruwin_alt_sh-UTF-8" >> /etc/vconsole.conf
 echo "FONT=cyr-sun16" >> /etc/vconsole.conf
 echo "LANG=ru_RU.UTF-8" > /etc/locale.conf
-echo "LC_COLLATE=C" >> /etc/locale.conf
+echo "LC_CTYPE=ru_RU.UTF-8" >> /etc/locale.conf
+echo "LC_NUMERIC=ru_RU.UTF-8" >> /etc/locale.conf
+echo "LC_TIME=ru_RU.UTF-8" >> /etc/locale.conf
+echo "LC_COLLATE=C.UTF-8" >> /etc/locale.conf
+echo "LC_MONETARY=ru_RU.UTF-8" >> /etc/locale.conf
+echo "LC_MESSAGES=ru_RU.UTF-8" >> /etc/locale.conf
+echo "LC_PAPER=ru_RU.UTF-8" >> /etc/locale.conf
+echo "LC_NAME=ru_RU.UTF-8" >> /etc/locale.conf
+echo "LC_ADDRESS=ru_RU.UTF-8" >> /etc/locale.conf
+echo "LC_TELEPHONE=ru_RU.UTF-8" >> /etc/locale.conf
+echo "LC_MEASUREMENT=ru_RU.UTF-8" >> /etc/locale.conf
+echo "LC_IDENTIFICATION=ru_RU.UTF-8" >> /etc/locale.conf
 sed -i "s/#\(en_US\.UTF-8\)/\1/" /etc/locale.gen
+sed -i "s/#\(en_US\ ISO-8859-1\)/\1/" /etc/locale.gen
 sed -i "s/#\(ru_RU\.UTF-8\)/\1/" /etc/locale.gen
+sed -i "s/#\(ru_RU\ ISO-8859-5\)/\1/" /etc/locale.gen
 sed -i 's/\(\/boot\/efi\s\+vfat\s\+\)\S\+\(.*\)/\1umask=0077    0 2/' /etc/fstab
 locale-gen
 time_zone=$(curl -s https://ipinfo.io/timezone)
@@ -200,15 +257,16 @@ hwclock --systohc
 pacman-mirrors --fasttrack
 pacman -Syy
 clear
-export LANG=ru_RU.UTF-8
-neofetch
 date
 lsblk
 
 
 
 
-################################ НАСТРОЙКА NANO ##################################
+
+####################
+## НАСТРОЙКА NANO ##
+####################
 
 
 
@@ -245,7 +303,9 @@ clear
 
 
 
-########## УСТ.ЯДРА И GRUB, ЗЕРКАЛА и MKINITCPIO #######
+##############################################
+### УСТ.ЯДРА, GRUB и MKINITCPIO. ЗЕРКАЛА #####
+##############################################
 
 
 
@@ -253,7 +313,7 @@ clear
 
 pacman -Syy
 clear
-pacman -Sy grub grub-theme-manjaro update-grub zsh  manjaro-zsh-config fwupd fwupd-efi bash bash-completion grub-btrfs networkmanager networkmanager-openconnect networkmanager-openvpn networkmanager-pptp networkmanager-vpnc openssh plymouth plymouth-theme-manjaro rsync os-prober --needed --noconfirm
+pacman -Sy linux66 linux66-headers linux-firmware networkmanager grub grub-btrfs update-grub plymouth plymouth-theme-manjaro zsh manjaro-zsh-config --needed --noconfirm
 clear
 sed -i "s/quiet/quiet splash resume=UUID=$(blkid -o value  /dev/sda3|head -n 1|tail -n 2) udev.log_priority=3/" /etc/default/grub
 sed -i "s/#GRUB_DISABLE_OS_PROBER=false/GRUB_DISABLE_OS_PROBER=false/" /etc/default/grub
@@ -281,27 +341,365 @@ clear
 
 
 
-########################  HOST, ПАРОЛЬ ROOT ##############################
+#######################
+## СИСТЕМНЫЕ УТИЛИТЫ ##
+#######################
 
 
 
-echo "PackardBell" > /etc/hostname
+
+pacman -Syy
+clear
+# Services
+pacman -S nm-connection-editor modemmanager usb_modeswitch rp-pppoe --needed --noconfirm
+clear
+pacman -S bluez bluez-utils --needed --noconfirm
+clear
+pacman -S cups cups-pdf ghostscript gsfonts --needed --noconfirm
+clear
+pacman -S cronie haveged openssh --needed --noconfirm
+clear
+pacman -S mlocate chrony --needed --noconfirm
+systemctl enable chrony-wait.service chronyd.service
+clear
+# XDG
+pacman -S xdg-utils xdg-user-dirs --needed --noconfirm
+clear
+systemctl enable grub-btrfsd.service sshd.service NetworkManager.service ModemManager.service cups.service  cronie.service bluetooth.service haveged.service
+clear
+# Pacman-contrib
+pacman -Syy
+pacman -S pacman-contrib --needed --noconfirm
+clear
+# Generic
+pacman -S vim wget usbutils lsof dmidecode dialog --needed --noconfirm
+clear
+# Compression
+pacman -S zip unzip unrar p7zip lzop --needed --noconfirm
+clear
+# Network Tools
+pacman -S rsync traceroute bind-tools --needed --noconfirm
+clear
+# File System
+pacman -S dosfstools ntfs-3g btrfs-progs exfat-utils gptfdisk fuse2 fuse3 fuseiso --needed --noconfirm
+clear
+# SAMBA
+pacman -S samba gvfs gvfs-smb smbclient cifs-utils gvfs-afc gvfs-mtp gvfs-nfs gvfs-dnssd gvfs-goa gvfs-google gvfs-gphoto2 gvfs-onedrive gvfs-wsdd --needed --noconfirm
+# ЗВУК
+# Wireplumber Pipewire
+pacman -S wireplumber pipewire-alsa pipewire-jack pipewire-pulse pipewire-v4l2 pipewire-zeroconf gst-plugin-pipewire helvum --needed --noconfirm
+clear
+# Alsa
+pacman -S alsa-firmware alsa-plugins alsa-utils sof-firmware --needed --noconfirm
+clear
+# GStreamer
+pacman -S gst-libav gst-plugins-bad gst-plugins-base gst-plugins-ugly gst-plugin-pipewire gst-plugin-va --needed --noconfirm
+clear
+# Firewalld
+pacman -S firewalld python-capng python-pyqt5 --needed --noconfirm
+systemctl enable firewalld.service
+clear
+# MAN
+pacman -S man-db most man-pages man-pages-ru yelp xorg-xman --needed --noconfirm
+clear
+# Утилиты вывода системной информации
+pacman -S hyfetch fastfetch --needed --noconfirm
+# XORG
+pacman -S xorg
+clear
+pacman -S xorg-drivers
+clear
+pacman -S xorg-apps --needed --noconfirm
+clear
+pacman -S xorg-xinit --needed --noconfirm 
+clear
+
+
+
+
+
+################################
+## ДОПОЛНИТЕЛЬНЫЕ РЕПОЗИТОРИИ ##
+################################
+
+######################
+## ARCOLINUX-SPICES ##
+######################
+
+
+
+clear
+pacman -Syy
+pacman -S git --needed --noconfirm
+git clone https://github.com/arcolinux/arcolinux-spices
+cd arcolinux-spices/usr/share/arcolinux-spices/scripts
+./get-the-keys-and-repos.sh
+cd
+pacman -Syy
+clear
+rm -r /arcolinux-spices
+pacman -Syy
+clear
+
+
+
+
+#################
+## Chaotic-AUR ##
+#################
+
+
+clear
+pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
+pacman-key --lsign-key 3056513887B78AEB
+pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' --noconfirm
+pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst' --noconfirm
+echo "#" >> /etc/pacman.conf
+echo "#" >> /etc/pacman.conf
+echo "### Chaotic-AUR #####" >> /etc/pacman.conf
+echo "[chaotic-aur]" >> /etc/pacman.conf
+echo "Include = /etc/pacman.d/chaotic-mirrorlist" >> /etc/pacman.conf
+#echo "GTK_THEME=Adwaita:dark" >> /etc/environment
+pacman -Syy
+clear
+
+
+
+
+
+
+########################################################
+########## ПРОГРАММЫ РЕЗЕРВНОГО КОПИРОВАНИЯ ############
+########################################################
+
+
+
+
+######################
+##  BTRFS ASSISTANT ##
+######################
+
+
+
+clear
+pacman -Syy
+clear
+pacman -S arcolinux-meta-btrfs-snapper snapper-tools btrfsmaintenance --needed --noconfirm
+clear
+
+
+
+
+################
+##  TIMESHIFT ##
+################
+
+
+clear
+pacman -Syy
+clear
+pacman -S arcolinux-meta-btrfs-timeshift --needed --noconfirm
+clear
+
+
+
+
+###########################################
+## СИСТЕМНЫЕ УТИЛИТЫ ARCOLINUX И CHAOTIC ##
+###########################################
+
+
+
+pacman -S arcolinux-meta-apps --needed --noconfirm
+clear
+pacman -S mkinitcpio-firmware --needed --noconfirm
+clear
+pacman -S arch-update --needed --noconfirm
+clear
+
+
+
+########################
+##  HOST, ПАРОЛЬ ROOT ##
+########################
+
+
+
+echo "Sony" > /etc/hostname
 echo "127.0.0.1   localhost" > /etc/hosts
 echo ": :1        localhost" >> /etc/hosts
-echo "127.0.1.1   PackardBell.localdomain   PackardBell" >> /etc/hosts
+echo "127.0.1.1   Sony.localdomain   Sony" >> /etc/hosts
 passwd
 clear
 
 
 
-###################### ПОЛЬЗОВАТЕЛЬ И ЕГО ПАРОЛЬ #######################
+
+###############################
+## ПОЛЬЗОВАТЕЛЬ И ЕГО ПАРОЛЬ ##
+###############################
 
 
 
-useradd administrator -m -c "Administrator" -s /bin/bash
-usermod -aG wheel,users administrator
+useradd login -m -c "User Name" -s /bin/zsh
+usermod -aG wheel,users login
 sed -i s/'# %wheel ALL=(ALL:ALL) ALL'/'%wheel ALL=(ALL:ALL) ALL'/g /etc/sudoers
-passwd administrator
+passwd login
+clear
+
+
+
+########################################################
+############### Установка графической оболочки #########
+########################################################
+
+
+
+
+###################
+## Установка KDE ##
+###################
+
+
+
+
+pacman -S sddm plasma-meta kde-applications-meta flatpak --needed --noconfirm
+systemctl enable sddm
+clear
+sed -i s/'#AutoEnable=true'/'AutoEnable=true'/g /etc/bluetooth/main.conf
+clear
+exit
+
+
+
+reboot
+
+
+
+rm -r .ssh/
+
+
+###############################
+## КОНФИГУРАЦИЯ ПОЛЬЗОВАТЕЛЯ ##
+###############################
+
+
+clear
+# xinitrc
+echo "export DESKTOP_SESSION=plasma" > ~/.xinitrc
+echo "exec startplasma-x11" >> ~/.xinitrc
+sudo cp ~/.xinitrc /root/.xinitrc
+# arch-update
+systemctl --user enable --now arch-update-tray.service
+systemctl --user enable --now arch-update.timer
+systemctl --user enable pipewire.socket pipewire-pulse.socket
+systemctl --user --force enable wireplumber.service
+mkdir -p .config/autostart/
+touch .config/autostart/arch-update.desktop
+chmod +rw .config/autostart/arch-update.desktop
+echo "[Desktop Entry]" > .config/autostart/arch-update.desktop
+echo "Encoding=UTF-8" >> .config/autostart/arch-update.desktop
+echo "Type=Application" >> .config/autostart/arch-update.desktop
+echo "Name=arch-update" >> .config/autostart/arch-update.desktop
+echo "Exec=arch-update --tray" >> .config/autostart/arch-update.desktop
+echo "RunHook=0" >> .config/autostart/arch-update.desktop
+echo "StartupNotify=false" >> .config/autostart/arch-update.desktop
+echo "Terminal=false" >> .config/autostart/arch-update.desktop
+echo "Hidden=false" >> .config/autostart/arch-update.desktop
+clear
+
+
+#####################
+## Установка XFCE4 ##
+#####################
+
+
+
+
+pacman -S xfce4 xfce4-goodies --needed --noconfirm
+clear
+pacman -S mugshot pavucontrol archlinux-xdg-menu ttf-droid ttf-dejavu alacarte network-manager-applet --needed --noconfirm
+update-menus
+pacman -Sy lightdm lightdm-slick-greeter lightdm-settings --needed --noconfirm
+clear
+pacman -Sy blueman xarchiver ffmpegthumbnailer libgsf udiskie --needed --noconfirm
+clear
+sed -i s/'#greeter-session=example-gtk-gnome'/'greeter-session=lightdm-slick-greeter'/g /etc/lightdm/lightdm.conf
+sed -i s/'#display-setup-script='/'display-setup-script=xrandr --output Virtual-1 --mode 1920x1080'/g /etc/lightdm/lightdm.conf
+systemctl enable lightdm.service
+clear
+sed -i s/'#AutoEnable=true'/'AutoEnable=true'/g /etc/bluetooth/main.conf
+clear
+exit
+
+
+
+reboot
+
+
+
+rm -r .ssh/
+
+
+###############################
+## КОНФИГУРАЦИЯ ПОЛЬЗОВАТЕЛЯ ##
+###############################
+
+
+
+clear
+# xinitrc
+echo "exec startxfce4" > ~/.xinitrc
+sudo cp ~/.xinitrc /root/.xinitrc
+# arch-update
+systemctl --user enable --now arch-update-tray.service
+systemctl --user enable --now arch-update.timer
+systemctl --user enable pipewire.socket pipewire-pulse.socket
+systemctl --user --force enable wireplumber.service
+mkdir -p .config/autostart/
+touch .config/autostart/arch-update.desktop
+chmod +rw .config/autostart/arch-update.desktop
+echo "[Desktop Entry]" > .config/autostart/arch-update.desktop
+echo "Encoding=UTF-8" >> .config/autostart/arch-update.desktop
+echo "Type=Application" >> .config/autostart/arch-update.desktop
+echo "Name=arch-update" >> .config/autostart/arch-update.desktop
+echo "Exec=arch-update --tray" >> .config/autostart/arch-update.desktop
+echo "RunHook=0" >> .config/autostart/arch-update.desktop
+echo "StartupNotify=false" >> .config/autostart/arch-update.desktop
+echo "Terminal=false" >> .config/autostart/arch-update.desktop
+echo "Hidden=false" >> .config/autostart/arch-update.desktop
+clear
+
+
+
+########## Флаги ##############
+
+
+clear
+mkdir -p ~/.local/share/xfce4/xkb/flags/
+cd ~/.local/share/xfce4/xkb/flags/
+wget https://upload.wikimedia.org/wikipedia/commons/5/53/Nuvola_USA_flag.svg
+wget https://upload.wikimedia.org/wikipedia/commons/a/ac/Nuvola_Russian_flag.svg
+mv -i Nuvola_USA_flag.svg us.svg
+mv -i Nuvola_Russian_flag.svg ru.svg
+cd
+clear
+sudo reboot
+
+
+
+
+#####################
+## Установка Gnome ##
+#####################
+
+
+pacman -S gnome gnome-extra --needed --noconfirm
+systemctl enable gdm
+clear
+pacman -S gnome-terminal-transparency gnome-shell-extensions chrome-gnome-shell --needed --noconfirm
+clear
+sed -i s/'#AutoEnable=true'/'AutoEnable=true'/g /etc/bluetooth/main.conf
 clear
 exit
 
@@ -316,304 +714,436 @@ rm -r .ssh/
 
 
 
+###############################
+## КОНФИГУРАЦИЯ ПОЛЬЗОВАТЕЛЯ ##
+###############################
 
 
-########### БАЗОВАЯ УСТАНОВКА ЗАВЕРШЕНА ##################################
 
 
-
-
-################## ARCOLINUX-SPICES #########################
-
-
-sudo pacman -Syy
-sudo pacman -Syu
-sudo pacman -S git --needed --noconfirm
-git clone https://github.com/arcolinux/arcolinux-spices
-cd arcolinux-spices/usr/share/arcolinux-spices/scripts
-sudo ./get-the-keys-and-repos.sh
-cd
-sudo pacman -Syy
-sudo pacman -Syu
 clear
-sudo rm -r arcolinux-spices/
-sudo pacman -Syy
-sudo pacman -Syu
-sudo pacman -S arcolinux-welcome-app-git archlinux-tweak-tool-git sofirem-git hw-probe smartmontools lsb-release alacritty mkinitcpio-firmware grub-btrfs snapper snap-pac snapper-support snapper-tools btrfsmaintenance btrfs-assistant --needed  --noconfirm
-echo snap >> $HOME/.hidden
-echo bin >> $HOME/.hidden
-clear
-
-
-
-
-######################### ARCHDI ######################
-
-
-curl -LO matmoul.github.io/archdi
-sudo chmod +x archdi
-sudo ./archdi
-sudo rm -r archdi
-clear
-
-
-
-
-
-################# Установка графической оболочки #######################
-
-
-
-
-
-############################## КОНФИГУРАЦИЯ KDE #####################################
-
-
-
-echo "export DESKTOP_SESSION=plasma" > ~/.xinitrc
-echo "exec startplasma-x11" >> ~/.xinitrc
-sudo cp ~/.xinitrc /root/.xinitrc
-sudo sed -i s/'#AutoEnable=true'/'AutoEnable=true'/g /etc/bluetooth/main.conf
-clear
-cp -Rf ~/.config ~/.config-backup-$(date +%Y.%m.%d-%H.%M.%S)
-cp -arf /etc/skel/. ~
-sudo reboot
-
-
-
-
-##################### КОНФИГУРАЦИЯ XFCE4 ##################
-
-
-
-sudo pacman -Sy lightdm lightdm-slick-greeter lightdm-settings --needed --noconfirm
-sudo sed -i s/'#greeter-session=example-gtk-gnome'/'greeter-session=lightdm-slick-greeter'/g /etc/lightdm/lightdm.conf
-sudo systemctl enable lightdm.service
-clear
-echo "exec startxfce4" > ~/.xinitrc
-sudo cp ~/.xinitrc /root/.xinitrc
-sudo sed -i s/'#AutoEnable=true'/'AutoEnable=true'/g /etc/bluetooth/main.conf
-clear
-sudo reboot
-
-
-
-
-#-------- Флаги ---------------
-
-mkdir -p ~/.local/share/xfce4/xkb/flags/
-cd ~/.local/share/xfce4/xkb/flags/
-wget https://upload.wikimedia.org/wikipedia/commons/5/53/Nuvola_USA_flag.svg
-wget https://upload.wikimedia.org/wikipedia/commons/a/ac/Nuvola_Russian_flag.svg
-mv -i Nuvola_USA_flag.svg us.svg
-mv -i Nuvola_Russian_flag.svg ru.svg
-cd
-clear
-
-#-------------------- Отключить сохранение сеансов
-
-xfconf-query -c xfce4-session -p /general/SaveOnExit -s false
-
-Затем пройдите в Настройки > Сеансы и запуск > Сохраненные сеансы и нажмите кнопку Очистить
-
-сохраненные сеансы для удаления имеющихся сохраненных сеансов
-
-
-
-#################### КОНФИГУРАЦИЯ Gnome ######################
-
-
-
+# xinitrc
 echo "export XDG_SESSION_TYPE=x11" > ~/.xinitrc
 echo "export GDK_BACKEND=x11" >> ~/.xinitrc
 echo "exec gnome-session" >> ~/.xinitrc
 sudo cp ~/.xinitrc /root/.xinitrc
-sudo sed -i s/'#AutoEnable=true'/'AutoEnable=true'/g /etc/bluetooth/main.conf
+# arch-update
+systemctl --user enable --now arch-update-tray.service
+systemctl --user enable --now arch-update.timer
+systemctl --user enable pipewire.socket pipewire-pulse.socket
+systemctl --user --force enable wireplumber.service
+mkdir -p .config/autostart/
+touch .config/autostart/arch-update.desktop
+chmod +rw .config/autostart/arch-update.desktop
+echo "[Desktop Entry]" > .config/autostart/arch-update.desktop
+echo "Encoding=UTF-8" >> .config/autostart/arch-update.desktop
+echo "Type=Application" >> .config/autostart/arch-update.desktop
+echo "Name=arch-update" >> .config/autostart/arch-update.desktop
+echo "Exec=arch-update --tray" >> .config/autostart/arch-update.desktop
+echo "RunHook=0" >> .config/autostart/arch-update.desktop
+echo "StartupNotify=false" >> .config/autostart/arch-update.desktop
+echo "Terminal=false" >> .config/autostart/arch-update.desktop
+echo "Hidden=false" >> .config/autostart/arch-update.desktop
 clear
-cp -Rf ~/.config ~/.config-backup-$(date +%Y.%m.%d-%H.%M.%S)
-cp -arf /etc/skel/. ~
-sudo reboot
 
 
 
+########################
+## Установка Cinnamon ##
+########################
 
 
-######################### КОНФИГУРАЦИЯ Cinnamon ##############
 
-
-sudo pacman -Sy lightdm lightdm-slick-greeter lightdm-settings --needed --noconfirm
-sudo sed -i s/'#greeter-session=example-gtk-gnome'/'greeter-session=lightdm-slick-greeter'/g /etc/lightdm/lightdm.conf
-sudo systemctl enable lightdm.service
+pacman -S lightdm lightdm-webkit2-greeter lightdm-webkit-theme-aether cinnamon cinnamon-translations metacity  gnome-terminal blueberry gnome-screenshot gnome-keyring system-config-printer iso-flag-png --needed --noconfirm
+sed -i s/'#greeter-session=example-gtk-gnome'/'greeter-session=lightdm-webkit2-greeter'/g /etc/lightdm/lightdm.conf
+sed -i s/'#display-setup-script='/'display-setup-script=xrandr --output Virtual-1 --mode 1920x1080'/g /etc/lightdm/lightdm.conf
+#sed -i s/'webkit_theme        = antergos'/'webkit_theme        = litarvan'/g /etc/lightdm/lightdm-webkit2-greeter.conf
+systemctl enable lightdm.service
 clear
+sed -i s/'#AutoEnable=true'/'AutoEnable=true'/g /etc/bluetooth/main.conf
+clear
+exit
+
+
+
+reboot
+
+
+
+rm -r .ssh/
+
+
+###############################
+## КОНФИГУРАЦИЯ ПОЛЬЗОВАТЕЛЯ ##
+###############################
+
+
+
+clear
+# xinitrc
 echo "exec cinnamon-session" > ~/.xinitrc
 sudo cp ~/.xinitrc /root/.xinitrc
-sudo sed -i s/'#AutoEnable=true'/'AutoEnable=true'/g /etc/bluetooth/main.conf
+# arch-update
+systemctl --user enable --now arch-update-tray.service
+systemctl --user enable --now arch-update.timer
+systemctl --user enable pipewire.socket pipewire-pulse.socket
+systemctl --user --force enable wireplumber.service
+mkdir -p .config/autostart/
+touch .config/autostart/arch-update.desktop
+chmod +rw .config/autostart/arch-update.desktop
+echo "[Desktop Entry]" > .config/autostart/arch-update.desktop
+echo "Encoding=UTF-8" >> .config/autostart/arch-update.desktop
+echo "Type=Application" >> .config/autostart/arch-update.desktop
+echo "Name=arch-update" >> .config/autostart/arch-update.desktop
+echo "Exec=arch-update --tray" >> .config/autostart/arch-update.desktop
+echo "RunHook=0" >> .config/autostart/arch-update.desktop
+echo "StartupNotify=false" >> .config/autostart/arch-update.desktop
+echo "Terminal=false" >> .config/autostart/arch-update.desktop
+echo "Hidden=false" >> .config/autostart/arch-update.desktop
 clear
-cp -Rf ~/.config ~/.config-backup-$(date +%Y.%m.%d-%H.%M.%S)
-cp -arf /etc/skel/. ~
-sudo reboot
 
 
-######################### КОНФИГУРАЦИЯ Mate ###################
+
+####################
+## Установка Mate ##
+####################
 
 
-sudo pacman -Sy lightdm lightdm-slick-greeter lightdm-settings --needed --noconfirm
-sudo sed -i s/'#greeter-session=example-gtk-gnome'/'greeter-session=lightdm-slick-greeter'/g /etc/lightdm/lightdm.conf
-sudo systemctl enable lightdm.service
+pacman -S mate mate-extra --needed --noconfirm
+pacman -S mate-themes mate-tweak brisk-menu gnome-system-tools --needed --noconfirm
+pacman -S plank plank-themes --needed --noconfirm
+pacman -Sy lightdm lightdm-slick-greeter lightdm-settings --needed --noconfirm
+sed -i s/'#greeter-session=example-gtk-gnome'/'greeter-session=lightdm-slick-greeter'/g /etc/lightdm/lightdm.conf
+sed -i s/'#display-setup-script='/'display-setup-script=xrandr --output Virtual-1 --mode 1920x1080'/g /etc/lightdm/lightdm.conf
+systemctl enable lightdm.service
 clear
+sed -i s/'#AutoEnable=true'/'AutoEnable=true'/g /etc/bluetooth/main.conf
+clear
+exit
+
+
+
+reboot
+
+
+
+rm -r .ssh/
+
+
+###############################
+## КОНФИГУРАЦИЯ ПОЛЬЗОВАТЕЛЯ ##
+###############################
+
+
+
+clear
+# xinitrc
 echo "exec mate-session" > ~/.xinitrc
 sudo cp ~/.xinitrc /root/.xinitrc
-sudo sed -i s/'#AutoEnable=true'/'AutoEnable=true'/g /etc/bluetooth/main.conf
+# arch-update
+systemctl --user enable --now arch-update-tray.service
+systemctl --user enable --now arch-update.timer
+systemctl --user enable pipewire.socket pipewire-pulse.socket
+systemctl --user --force enable wireplumber.service
+mkdir -p .config/autostart/
+touch .config/autostart/arch-update.desktop
+chmod +rw .config/autostart/arch-update.desktop
+echo "[Desktop Entry]" > .config/autostart/arch-update.desktop
+echo "Encoding=UTF-8" >> .config/autostart/arch-update.desktop
+echo "Type=Application" >> .config/autostart/arch-update.desktop
+echo "Name=arch-update" >> .config/autostart/arch-update.desktop
+echo "Exec=arch-update --tray" >> .config/autostart/arch-update.desktop
+echo "RunHook=0" >> .config/autostart/arch-update.desktop
+echo "StartupNotify=false" >> .config/autostart/arch-update.desktop
+echo "Terminal=false" >> .config/autostart/arch-update.desktop
+echo "Hidden=false" >> .config/autostart/arch-update.desktop
 clear
-cp -Rf ~/.config ~/.config-backup-$(date +%Y.%m.%d-%H.%M.%S)
-cp -arf /etc/skel/. ~
-sudo reboot
+
+
+
+####################
+## Установка LXQT ##
+####################
+
+
+
+pacman -S lxqt lxqt-themes xscreensaver picom libstatgrab libsysstat breeze-icons kvantum-qt5 mugshot nm-tray --needed --noconfirm
+pacman -Sy lightdm lightdm-slick-greeter lightdm-settings --needed --noconfirm
+clear
+sed -i s/'#greeter-session=example-gtk-gnome'/'greeter-session=lightdm-slick-greeter'/g /etc/lightdm/lightdm.conf
+sed -i s/'#display-setup-script='/'display-setup-script=xrandr --output Virtual-1 --mode 1920x1080'/g /etc/lightdm/lightdm.conf
+systemctl enable lightdm.service
+sed -i s/'#AutoEnable=true'/'AutoEnable=true'/g /etc/bluetooth/main.conf
+clear
+exit
+
+
+
+reboot
+
+
+
+rm -r .ssh/
 
 
 
 
-
-Флаг расклалки клавиауры
-
-
-
-mkdir -p ~/.icons/flags
-ln -s /usr/share/iso-flag-png/* ~/.icons/flags
-gsettings set org.mate.peripherals-keyboard-xkb.indicator show-flags "true"
+###############################
+## КОНФИГУРАЦИЯ ПОЛЬЗОВАТЕЛЯ ##
+###############################
 
 
-
-
-###################### КОНФИГУРАЦИЯ LXQT ##################################
-
-
-
+clear
+# xinitrc
 echo "exec startlxqt" > ~/.xinitrc
 sudo cp ~/.xinitrc /root/.xinitrc
-sudo sed -i s/'#AutoEnable=true'/'AutoEnable=true'/g /etc/bluetooth/main.conf
-cp -Rf ~/.config ~/.config-backup-$(date +%Y.%m.%d-%H.%M.%S)
-cp -arf /etc/skel/. ~
+# arch-update
+systemctl --user enable --now arch-update-tray.service
+systemctl --user enable --now arch-update.timer
+systemctl --user enable pipewire.socket pipewire-pulse.socket
+systemctl --user --force enable wireplumber.service
+mkdir -p .config/autostart/
+touch .config/autostart/arch-update.desktop
+chmod +rw .config/autostart/arch-update.desktop
+echo "[Desktop Entry]" > .config/autostart/arch-update.desktop
+echo "Encoding=UTF-8" >> .config/autostart/arch-update.desktop
+echo "Type=Application" >> .config/autostart/arch-update.desktop
+echo "Name=arch-update" >> .config/autostart/arch-update.desktop
+echo "Exec=arch-update --tray" >> .config/autostart/arch-update.desktop
+echo "RunHook=0" >> .config/autostart/arch-update.desktop
+echo "StartupNotify=false" >> .config/autostart/arch-update.desktop
+echo "Terminal=false" >> .config/autostart/arch-update.desktop
+echo "Hidden=false" >> .config/autostart/arch-update.desktop
 clear
-sudo reboot
 
 
+########## Флаги ##############
 
-
-
-
-#---------------- Флаг раскладки -----------
-
-mkdir -p ~/.local/share/flags
-cd ~/.local/share/flags/
+mkdir -p .local/share/flags
+cd .local/share/flags
 wget https://upload.wikimedia.org/wikipedia/commons/5/53/Nuvola_USA_flag.svg
 wget https://upload.wikimedia.org/wikipedia/commons/a/ac/Nuvola_Russian_flag.svg
 mv -i Nuvola_USA_flag.svg us.svg
 mv -i Nuvola_Russian_flag.svg ru.svg
-cd
+
+
+В нстройках клавиатуры указываем
+
+путь к флагам:
+
+/home/login/.local/share/flags/%1.svg
+
+
+
+####################
+## Установка LXDE ##
+####################
+
+
+
+
+pacman -Syy
 clear
+pacman -S lxde leafpad openbox ttf-dejavu ttf-liberation obconf pavucontrol alsa-utils xfce4-notifyd --needed --noconfirm
+clear
+pacman -S xscreensaver picom libstatgrab libsysstat arc-gtk-theme mugshot nm-tray dunst --needed --noconfirm
+clear
+pacman -Sy lxqt-archiver ffmpegthumbnailer exaile --needed --noconfirm
+clear
+pacman -S thunar-archive-plugin  thunar-media-tags-plugin thunar-shares-plugin ffmpegthumbnailer libgsf udiskie --needed --noconfirm
+update-menus
+clear
+pacman -Sy lightdm lightdm-slick-greeter lightdm-settings --needed --noconfirm
+clear
+pacman -Sy blueman lxqt-archiver ffmpegthumbnailer exaile --needed --noconfirm
+clear
+sed -i s/'#greeter-session=example-gtk-gnome'/'greeter-session=lightdm-slick-greeter'/g /etc/lightdm/lightdm.conf
+sed -i s/'#display-setup-script='/'display-setup-script=xrandr --output Virtual-1 --mode 1920x1080'/g /etc/lightdm/lightdm.conf
+systemctl enable lightdm.service
+sed -i s/'#AutoEnable=true'/'AutoEnable=true'/g /etc/bluetooth/main.conf
+clear
+exit
 
 
-nano ~/.config/lxqt/panel.conf
 
-
-[kbindicator]
-alignment=Right
-keeper_type=global
-layout_flag_pattern=/home/administrator/.local/share/flags/%1.svg
-show_caps_lock=false
-show_layout=true
-show_num_lock=false
-show_scroll_lock=false
-type=kbindicator
+reboot
 
 
 
-
-###################### КОНФИГУРАЦИЯ DEPIN ###########################
-
+rm -r .ssh/
 
 
+###############################
+## КОНФИГУРАЦИЯ ПОЛЬЗОВАТЕЛЯ ##
+###############################
 
-sudo pacman -Sy deepin-kwin lightdm lightdm-deepin-greeter  --needed --noconfirm
-sudo sed -i s/'#greeter-session=example-gtk-gnome'/'greeter-session=lightdm-deepin-greeter'/g /etc/lightdm/lightdm.conf
-sudo systemctl enable lightdm.service
-echo "exec startdde" > ~/.xinitrc
+
+
+clear
+# xinitrc
+echo "exec startlxde" > ~/.xinitrc
 sudo cp ~/.xinitrc /root/.xinitrc
-sudo sed -i s/'#AutoEnable=true'/'AutoEnable=true'/g /etc/bluetooth/main.conf
-cp -Rf ~/.config ~/.config-backup-$(date +%Y.%m.%d-%H.%M.%S)
-cp -arf /etc/skel/. ~
+# arch-update
+systemctl --user enable --now arch-update-tray.service
+systemctl --user enable --now arch-update.timer
+systemctl --user enable pipewire.socket pipewire-pulse.socket
+systemctl --user --force enable wireplumber.service
+mkdir -p .config/autostart/
+touch .config/autostart/arch-update.desktop
+chmod +rw .config/autostart/arch-update.desktop
+echo "[Desktop Entry]" > .config/autostart/arch-update.desktop
+echo "Encoding=UTF-8" >> .config/autostart/arch-update.desktop
+echo "Type=Application" >> .config/autostart/arch-update.desktop
+echo "Name=arch-update" >> .config/autostart/arch-update.desktop
+echo "Exec=arch-update --tray" >> .config/autostart/arch-update.desktop
+echo "RunHook=0" >> .config/autostart/arch-update.desktop
+echo "StartupNotify=false" >> .config/autostart/arch-update.desktop
+echo "Terminal=false" >> .config/autostart/arch-update.desktop
+echo "Hidden=false" >> .config/autostart/arch-update.desktop
 clear
-sudo reboot
 
 
+######################
+## Установка BUDGIE ##
+######################
 
 
-#################XXXXXXXXXX Ukui XXXXXXXXXXXXX#######################
-
-
-
-
-sudo sed -i s/'#AutoEnable=true'/'AutoEnable=true'/g /etc/bluetooth/main.conf
+pacman -Syy
+pacman -S budgie-desktop --needed --noconfirm
+pacman -S gnome gnome-control-center --needed --noconfirm
+pacman -S materia-gtk-theme papirus-icon-theme i3lock --needed --noconfirm
+pacman -S lightdm lightdm-gtk-greeter --needed --noconfirm
+sed -i s/'#display-setup-script='/'display-setup-script=xrandr --output Virtual-1 --mode 1920x1080'/g /etc/lightdm/lightdm.conf
+systemctl enable lightdm
 clear
-sudo reboot
-
-
-
-###################### BUDGIE ###########################
-
-
-sudo pacman -Sy lightdm lightdm-slick-greeter lightdm-settings --needed --noconfirm
-sudo sed -i s/'#greeter-session=example-gtk-gnome'/'greeter-session=lightdm-slick-greeter'/g /etc/lightdm/lightdm.conf
-sudo systemctl enable lightdm.service
+sed -i s/'#AutoEnable=true'/'AutoEnable=true'/g /etc/bluetooth/main.conf
 clear
+exit
+
+
+
+reboot
+
+
+
+rm -r .ssh/
+
+
+###############################
+## КОНФИГУРАЦИЯ ПОЛЬЗОВАТЕЛЯ ##
+###############################
+
+
+clear
+# xinitrc
 echo "export XDG_CURRENT_DESKTOP=Budgie:GNOME" > ~/.xinitrc
 echo "exec budgie-desktop" >> ~/.xinitrc
 sudo cp ~/.xinitrc /root/.xinitrc
-sudo sed -i s/'#AutoEnable=true'/'AutoEnable=true'/g /etc/bluetooth/main.conf
-cp -Rf ~/.config ~/.config-backup-$(date +%Y.%m.%d-%H.%M.%S)
-cp -arf /etc/skel/. ~
+# arch-update
+systemctl --user enable --now arch-update-tray.service
+systemctl --user enable --now arch-update.timer
+systemctl --user enable pipewire.socket pipewire-pulse.socket
+systemctl --user --force enable wireplumber.service
+mkdir -p .config/autostart/
+touch .config/autostart/arch-update.desktop
+chmod +rw .config/autostart/arch-update.desktop
+echo "[Desktop Entry]" > .config/autostart/arch-update.desktop
+echo "Encoding=UTF-8" >> .config/autostart/arch-update.desktop
+echo "Type=Application" >> .config/autostart/arch-update.desktop
+echo "Name=arch-update" >> .config/autostart/arch-update.desktop
+echo "Exec=arch-update --tray" >> .config/autostart/arch-update.desktop
+echo "RunHook=0" >> .config/autostart/arch-update.desktop
+echo "StartupNotify=false" >> .config/autostart/arch-update.desktop
+echo "Terminal=false" >> .config/autostart/arch-update.desktop
+echo "Hidden=false" >> .config/autostart/arch-update.desktop
 clear
-sudo reboot
 
 
 
 
 
-
-################ Активация конфигурации ArcoLinux ######################
-
-
-clear
-cp -Rf ~/.config ~/.config-backup-$(date +%Y.%m.%d-%H.%M.%S)
-cp -arf /etc/skel/. ~
-sudo reboot
+###########################################
+################ ZSH ######################
+###########################################
 
 
 
-################## Тихий GRUB ##############################
-
-##################  Silent boot - Chaotic ##############################
-
+################################
+##         1 Часть.           ##
+## Установка  Zsh, Oh-My-Zsh, ##
+## Fastfetch, Lolcat, Git     ##
+################################
 
 
 
 sudo pacman -Syy
-sudo pacman -Syu
-sudo pacman -Sy grub-silent
-sudo grub-install /dev/sda
-sudo grub-install --target=x86_64-efi --removable
-sudo sed -i "s/splash/splash resume=UUID=$(blkid -o value  /dev/sda3|head -n 1|tail -n 2) udev.log_priority=3/" /etc/default/grub
-sudo sed -i "s/GRUB\_RECORDFAIL\_TIMEOUT\=\$GRUB_TIMEOUT/GRUB\_RECORDFAIL\_TIMEOUT\=\$GRUB\_HIDDEN\_TIMEOUT/" /etc/default/grub
-sudo sed -i "s/#GRUB_HIDDEN_TIMEOUT=0/GRUB_HIDDEN_TIMEOUT=1/" /etc/default/grub
-sudo sed -i "s/#GRUB_HIDDEN_TIMEOUT_QUIET=true/GRUB_HIDDEN_TIMEOUT_QUIET=true/" /etc/default/grub
-sudo grub-mkconfig -o /boot/grub/grub.cfg
-sudo mkinitcpio -P
+sudo pacman -Syu --noconfirm
+sudo pacman -Sy zsh git --needed --noconfirm
+curl -L http://install.ohmyz.sh | sh
+chsh -s /bin/zsh
+clear
+zsh
+
+
+
+
+#####################################
+##          2 Часть.               ##
+## Настройка Oh-My-Zsh и Fastfetch ##
+#####################################
+
+
+clear
+sed -i s/'ZSH_THEME="robbyrussell"'/'ZSH_THEME="agnoster"'/g ~/.zshrc
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git
+mv zsh-syntax-highlighting ~/.oh-my-zsh/plugins
+echo "source ~/.oh-my-zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> ~/.zshrc
+git clone https://github.com/zsh-users/zsh-autosuggestions
+mv zsh-autosuggestions ~/.oh-my-zsh/custom/plugins
+sed -i s/'plugins=(git)'/'plugins=(git archlinux extract sudo themes zsh-navigation-tools zsh-autosuggestions)'/g ~/.zshrc
+clear
+echo "hyfetch" >> ~/.zshrc
+clear
+source ~/.zshrc
+
+
+
+
+###############
+## Программы ##
+###############
+
+
+
+
+clear
+sudo pacman -S ventoy-bin gparted qbittorrent google-chrome thunderbird-i18n-ru libreoffice-fresh-ru atril btop cpu-x grub-customizer hardinfo2 stacer cherrytree htop seahorse system-monitoring-center octopi smplayer strawberry doublecmd-qt6 nomacs ocs-url archlinux-wallpaper octopi --needed --noconfirm
+clear
+sudo pacman -S yay --needed --noconfirm
+clear
+yay -S radiotray-ng --needed --noconfirm
+clear
 sudo reboot
 
 
 
+##########
+## Темы ##
+##########
+
+
+sudo pacman -S arc-gtk-theme arc-icon-theme gnome-system-tools numix-gtk-theme numix-icon-theme materia-gtk-theme papirus-icon-theme --needed --noconfirm
+clear
+yay -S tango-icon-theme gnome-themes-standard light-themes grub2-theme-arch-leap --needed --noconfirm
+clear
+sudo reboot
+
+
+
+############################################################
+################# FINISH ###################################
+############################################################
 
 
 
 
-############################### FINISH #####################################################
