@@ -599,18 +599,6 @@ sudo cp ~/.xinitrc /root/.xinitrc
 # arch-update
 systemctl --user enable pipewire.socket pipewire-pulse.socket
 systemctl --user --force enable wireplumber.service
-mkdir -p .config/autostart/
-touch .config/autostart/arch-update.desktop
-chmod +rw .config/autostart/arch-update.desktop
-echo "[Desktop Entry]" > .config/autostart/arch-update.desktop
-echo "Encoding=UTF-8" >> .config/autostart/arch-update.desktop
-echo "Type=Application" >> .config/autostart/arch-update.desktop
-echo "Name=arch-update" >> .config/autostart/arch-update.desktop
-echo "Exec=arch-update --tray" >> .config/autostart/arch-update.desktop
-echo "RunHook=0" >> .config/autostart/arch-update.desktop
-echo "StartupNotify=false" >> .config/autostart/arch-update.desktop
-echo "Terminal=false" >> .config/autostart/arch-update.desktop
-echo "Hidden=false" >> .config/autostart/arch-update.desktop
 clear
 
 
@@ -669,21 +657,8 @@ clear
 # xinitrc
 echo "exec startxfce4" > ~/.xinitrc
 sudo cp ~/.xinitrc /root/.xinitrc
-# arch-update
 systemctl --user enable pipewire.socket pipewire-pulse.socket
 systemctl --user --force enable wireplumber.service
-mkdir -p .config/autostart/
-touch .config/autostart/arch-update.desktop
-chmod +rw .config/autostart/arch-update.desktop
-echo "[Desktop Entry]" > .config/autostart/arch-update.desktop
-echo "Encoding=UTF-8" >> .config/autostart/arch-update.desktop
-echo "Type=Application" >> .config/autostart/arch-update.desktop
-echo "Name=arch-update" >> .config/autostart/arch-update.desktop
-echo "Exec=arch-update --tray" >> .config/autostart/arch-update.desktop
-echo "RunHook=0" >> .config/autostart/arch-update.desktop
-echo "StartupNotify=false" >> .config/autostart/arch-update.desktop
-echo "Terminal=false" >> .config/autostart/arch-update.desktop
-echo "Hidden=false" >> .config/autostart/arch-update.desktop
 clear
 
 
@@ -758,18 +733,6 @@ echo "exec gnome-session" >> ~/.xinitrc
 sudo cp ~/.xinitrc /root/.xinitrc
 systemctl --user enable pipewire.socket pipewire-pulse.socket
 systemctl --user --force enable wireplumber.service
-mkdir -p .config/autostart/
-touch .config/autostart/arch-update.desktop
-chmod +rw .config/autostart/arch-update.desktop
-echo "[Desktop Entry]" > .config/autostart/arch-update.desktop
-echo "Encoding=UTF-8" >> .config/autostart/arch-update.desktop
-echo "Type=Application" >> .config/autostart/arch-update.desktop
-echo "Name=arch-update" >> .config/autostart/arch-update.desktop
-echo "Exec=arch-update --tray" >> .config/autostart/arch-update.desktop
-echo "RunHook=0" >> .config/autostart/arch-update.desktop
-echo "StartupNotify=false" >> .config/autostart/arch-update.desktop
-echo "Terminal=false" >> .config/autostart/arch-update.desktop
-echo "Hidden=false" >> .config/autostart/arch-update.desktop
 clear
 
 
@@ -877,17 +840,6 @@ sudo cp ~/.xinitrc /root/.xinitrc
 systemctl --user enable pipewire.socket pipewire-pulse.socket
 systemctl --user --force enable wireplumber.service
 mkdir -p .config/autostart/
-touch .config/autostart/arch-update.desktop
-chmod +rw .config/autostart/arch-update.desktop
-echo "[Desktop Entry]" > .config/autostart/arch-update.desktop
-echo "Encoding=UTF-8" >> .config/autostart/arch-update.desktop
-echo "Type=Application" >> .config/autostart/arch-update.desktop
-echo "Name=arch-update" >> .config/autostart/arch-update.desktop
-echo "Exec=arch-update --tray" >> .config/autostart/arch-update.desktop
-echo "RunHook=0" >> .config/autostart/arch-update.desktop
-echo "StartupNotify=false" >> .config/autostart/arch-update.desktop
-echo "Terminal=false" >> .config/autostart/arch-update.desktop
-echo "Hidden=false" >> .config/autostart/arch-update.desktop
 clear
 
 
@@ -934,18 +886,6 @@ echo "exec startlxqt" > ~/.xinitrc
 sudo cp ~/.xinitrc /root/.xinitrc
 systemctl --user enable pipewire.socket pipewire-pulse.socket
 systemctl --user --force enable wireplumber.service
-mkdir -p .config/autostart/
-touch .config/autostart/arch-update.desktop
-chmod +rw .config/autostart/arch-update.desktop
-echo "[Desktop Entry]" > .config/autostart/arch-update.desktop
-echo "Encoding=UTF-8" >> .config/autostart/arch-update.desktop
-echo "Type=Application" >> .config/autostart/arch-update.desktop
-echo "Name=arch-update" >> .config/autostart/arch-update.desktop
-echo "Exec=arch-update --tray" >> .config/autostart/arch-update.desktop
-echo "RunHook=0" >> .config/autostart/arch-update.desktop
-echo "StartupNotify=false" >> .config/autostart/arch-update.desktop
-echo "Terminal=false" >> .config/autostart/arch-update.desktop
-echo "Hidden=false" >> .config/autostart/arch-update.desktop
 clear
 
 
@@ -1020,18 +960,6 @@ echo "exec startlxde" > ~/.xinitrc
 sudo cp ~/.xinitrc /root/.xinitrc
 systemctl --user enable pipewire.socket pipewire-pulse.socket
 systemctl --user --force enable wireplumber.service
-mkdir -p .config/autostart/
-touch .config/autostart/arch-update.desktop
-chmod +rw .config/autostart/arch-update.desktop
-echo "[Desktop Entry]" > .config/autostart/arch-update.desktop
-echo "Encoding=UTF-8" >> .config/autostart/arch-update.desktop
-echo "Type=Application" >> .config/autostart/arch-update.desktop
-echo "Name=arch-update" >> .config/autostart/arch-update.desktop
-echo "Exec=arch-update --tray" >> .config/autostart/arch-update.desktop
-echo "RunHook=0" >> .config/autostart/arch-update.desktop
-echo "StartupNotify=false" >> .config/autostart/arch-update.desktop
-echo "Terminal=false" >> .config/autostart/arch-update.desktop
-echo "Hidden=false" >> .config/autostart/arch-update.desktop
 clear
 
 
@@ -1075,18 +1003,6 @@ echo "exec budgie-desktop" >> ~/.xinitrc
 sudo cp ~/.xinitrc /root/.xinitrc
 systemctl --user enable pipewire.socket pipewire-pulse.socket
 systemctl --user --force enable wireplumber.service
-mkdir -p .config/autostart/
-touch .config/autostart/arch-update.desktop
-chmod +rw .config/autostart/arch-update.desktop
-echo "[Desktop Entry]" > .config/autostart/arch-update.desktop
-echo "Encoding=UTF-8" >> .config/autostart/arch-update.desktop
-echo "Type=Application" >> .config/autostart/arch-update.desktop
-echo "Name=arch-update" >> .config/autostart/arch-update.desktop
-echo "Exec=arch-update --tray" >> .config/autostart/arch-update.desktop
-echo "RunHook=0" >> .config/autostart/arch-update.desktop
-echo "StartupNotify=false" >> .config/autostart/arch-update.desktop
-echo "Terminal=false" >> .config/autostart/arch-update.desktop
-echo "Hidden=false" >> .config/autostart/arch-update.desktop
 clear
 
 
